@@ -55,8 +55,8 @@ jobs:
           npm rebuild node-sass --force
           npm run build -- --colors
 
-  BuildAndTest:
-    needs: Install
+  Test:
+    needs: Build
     runs-on: ubuntu-latest
 
     steps: 
@@ -76,10 +76,8 @@ jobs:
           path: node_modules
           key: node_modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Build
-        run: |
-          npm rebuild node-sass --force
-          npm run build -- --colors
+      - name: Test
+        run:
           npm run test
 
 
