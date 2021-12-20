@@ -1,13 +1,32 @@
 name: Build and test our eshop
 
-on: 
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
+    inputs:
+      Install:
+        description: 'Install'
+        required: true
+
+      Build:
+        description: 'Build'
+        required: true
+
+      Test:
+        description: 'Test'
+        required: true
+
 
 jobs:
   # install all dependencies
   Install:
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
@@ -18,10 +37,10 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: 10
-      
+
       - name: Cache
         uses: actions/cache@v2.1.6
-        with: 
+        with:
           path: node_modules
           key: node_modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: node_modules-
@@ -33,7 +52,7 @@ jobs:
     needs: Install
     runs-on: ubuntu-latest
 
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
         with:
@@ -46,7 +65,7 @@ jobs:
 
       - name: Load cached modules
         uses: actions/cache@v2.1.6
-        with: 
+        with:
           path: node_modules
           key: node_modules-${{ hashFiles('**/package-lock.json') }}
 
@@ -55,11 +74,22 @@ jobs:
           npm rebuild node-sass --force
           npm run build -- --colors
 
+      - name: Cache ./node_modules and ./build
+          if: ${{ github.ref == 'refs/heads/master' }}
+          uses: actions/cache@v2.1.6
+          with:
+            path: |
+              ~/.npm
+              ./node_modules
+              ./build
+            key: ${{ runner.os }}-build-${{ github.run_id }}
+            restore-keys: ${{ runner.os }}-build-${{ github.run_id }}
+
   Test:
     needs: Install
     runs-on: ubuntu-latest
 
-    steps: 
+    steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
         with:
@@ -72,12 +102,10 @@ jobs:
 
       - name: Load cached modules
         uses: actions/cache@v2.1.6
-        with: 
+        with:
           path: node_modules
           key: node_modules-${{ hashFiles('**/package-lock.json') }}
 
       - name: Test
         run:
           npm run test -- --colors
-
-
