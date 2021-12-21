@@ -6,10 +6,10 @@
     - name: Launch EC2 instance
       amazon.aws.ec2:
         instance_type: t2.small
-        image: ami-0ed9277fb7eb570c9
+        image: ami-061ac2e015473fbe2
         region: us-east-1
         key_name: devops
-        vpc_subnet_id: subnet-0c4ba0286b61ed0f7
+        vpc_subnet_id: subnet-064aff4ca50efb9fd
         assign_public_ip: yes
         count: 1
         group: eshop
