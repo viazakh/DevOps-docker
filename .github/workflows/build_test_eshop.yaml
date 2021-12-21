@@ -74,6 +74,17 @@ jobs:
           npm rebuild node-sass --force
           npm run build -- --colors
 
+      - name: Cache node modules and build folder
+          if: ${{ github.ref == 'refs/heads/master' }}
+          uses: actions/cache@v2
+          with:
+            path: |
+              ~/.npm
+              ./node_modules
+              ./build
+            key: ${{ runner.os }}-build-${{ github.run_id }}
+            restore-keys: ${{ runner.os }}-build-${{ github.run_id }}
+
   Test:
     needs: Install
     runs-on: ubuntu-latest
@@ -98,7 +109,6 @@ jobs:
       - name: Test
         run:
           npm run test -- --colors
-
 
   Deploy:
     needs: ["test", "build"]
